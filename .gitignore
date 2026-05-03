@@ -208,3 +208,10 @@ __marimo__/
 
 # Don't commit big files
 distilbert-brown-pos
+
+# Don't commit report files, except for the figures and tex/pdf
+/report/*
+!report/figures/
+!report/project_report.tex
+!report/bibliography.bib
+!report/project_report.pdf
