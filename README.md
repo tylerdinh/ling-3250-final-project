@@ -29,13 +29,15 @@ Mid April - End
 
 ## References
 
-[Chapter 2 of Natural Language Processing with Transformers, Revised Edition](https://www.oreilly.com/library/view/natural-language-processing/9781098136789/)
+[Chapter 2 of Natural Language Processing with Transformers, Revised Edition](https://www.oreilly.com/library/view/natural-language-processing/9781098136789/) - learned a bit more about Transformers and NLP with this
 
 [Hugging Face DistilBERT API docs](https://huggingface.co/docs/transformers/en/model_doc/distilbert)
 
 [Hugging Face Dataset API docs](https://huggingface.co/docs/datasets/package_reference/main_classes)
 
 [Hugging Face Trainer API docs](https://huggingface.co/docs/transformers/main_classes/trainer)
+
+[Hugging Face DistilBERT-Brown-POS Model Card](https://huggingface.co/nevertipyourlandlord/distilbert-brown-pos) - the actual fine tuned model that I was able to get
 
 [PyTorch API docs](https://devdocs.io/pytorch~1.13/)
 
