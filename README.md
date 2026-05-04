@@ -6,7 +6,7 @@ Part-of-speech (POS) tagging is one of the foundational tasks in Natural Languag
 
 The data will be sourced from the Brown corpus, available directly through the NLTK package, which contains approximately one million words annotated with POS tags. This corpus will be split into a 80%/20% train-test split following standard machine learning practices. The model will be DistilBERT, a 40% smaller size and 60% faster runtime spin of BERT that is available through Hugging Face’s Transformers package. As a BERT family model, it can be fine-tuned as a token classification model for POS tagging tasks. The fine-tuned DistilBERT model will be publicly released on Hugging Face, allowing it to be easily used for evaluation on the test split in a Jupyter Notebook without needing to locally fine-tune it yourself.
 
-The computational component involves setting up the data pipeline, tokenizing the corpus in a way that preserves word-to-tag alignment, fine-tuning the model, and evaluating with standard metrics including a classification report for each tag, a confusion matrix across tag classes, and a list of common prediction errors. The linguistic component will mainly include an analysis of the model's tagging errors and a focus on ambiguous words that can function as multiple parts of speech depending on context. I will also compare the fine-tuned DistilBERT model against NLTK's perceptron model POS tagger to see what differences exist between the two approaches.
+The computational component involves setting up the data pipeline, tokenizing the corpus in a way that preserves word-to-tag alignment, fine-tuning the model, and evaluating with standard metrics including a classification report for each tag, a confusion matrix across tag classes, and a list of common prediction errors. The linguistic component will mainly include an analysis of the model's tagging errors and a focus on ambiguous words that can function as multiple parts of speech depending on context. As a bonus, I will also compare the fine-tuned DistilBERT model against NLTK's perceptron model POS tagger to see what differences exist between the two approaches.
 
 ## Repository Structure
 
@@ -38,6 +38,10 @@ Mid April - End
 [Hugging Face Trainer API docs](https://huggingface.co/docs/transformers/main_classes/trainer)
 
 [Hugging Face DistilBERT-Brown-POS Model Card](https://huggingface.co/nevertipyourlandlord/distilbert-brown-pos) - the actual fine tuned model that I was able to get
+
+[NLTK PerceptronTagger API docs](https://www.nltk.org/api/nltk.tag.perceptron.html)
+
+[NLTK Corpus API docs](https://www.nltk.org/howto/corpus.html)
 
 [PyTorch API docs](https://devdocs.io/pytorch~1.13/)
 
