@@ -33,6 +33,8 @@ Mid April - End
 
 [Hugging Face DistilBERT API docs](https://huggingface.co/docs/transformers/en/model_doc/distilbert)
 
+[Hugging Face Dataset API docs](https://huggingface.co/docs/datasets/package_reference/main_classes)
+
 [Hugging Face Trainer API docs](https://huggingface.co/docs/transformers/main_classes/trainer)
 
 [PyTorch API docs](https://devdocs.io/pytorch~1.13/)

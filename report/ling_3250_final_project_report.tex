@@ -51,14 +51,14 @@ Finally, I examined the distribution of POS tags by computing the frequency of e
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.5\textwidth]{figures/top_ten_ds.png}
+\includegraphics[width=0.4\textwidth]{figures/top_ten_ds.png}
 \caption{Top ten POS tags by frequency}
 \label{fig:top_ten_ds}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.5\textwidth]{figures/bottom_ten_ds.png}
+\includegraphics[width=0.4\textwidth]{figures/bottom_ten_ds.png}
 \caption{Bottom ten POS tags by frequency}
 \label{fig:bottom_ten_ds}
 \end{figure}
@@ -67,19 +67,65 @@ Finally, I examined the distribution of POS tags by computing the frequency of e
 
 The Brown corpus contains a lot of very specific POS tags. To simultaneously reduce task complexity and improve model performance for classification, I simplified the Brown corpus' tagset by extracting only the base tag. This simplification of the tagset can be justified, because the base tag should capture most of the part-of-speech information of a word, while making the classification task more manageable. This was accomplished by splitting on both the ``+'' and ``-'' characters in the tag and retaining only the first component of the tag. The simplification that I implemented reduced the number of distinct tags from the initial 472 to the simplified 105 tags.
 
-I then extracted all tagged sentences from the Brown corpus and converted them into a structured format compatible with Hugging Face's Dataset API. Each sentence was represented as a dictionary containing a list of word tokens and their corresponding simplified POS tags, and all of the sentences were stored inside a list. The full dataset was then split into a 80\% training and 20\% test split.
+I then extracted all tagged sentences from the Brown corpus and converted them into a structured format compatible with Hugging Face's Dataset API \cite{huggingface_datasets}. Each sentence was represented as a dictionary containing a list of word tokens and their corresponding simplified POS tags, and all of the sentences were stored inside a list. The full dataset was then split into a 80\% training and 20\% test split.
 
 A big challenge for this project is token classification. The subword tokenization that is used by DistilBERT splits words into multiple tokens, which can potentially create a mismatch between word labels and token predictions. To address this, I implemented a method that tokenizes each sentence using DistilBERT's tokenizer with the is\_split\_into\_words=True flag to preserve word boundaries, tracks the original word that each token corresponds to using the word\_ids() method, and then finally assigns the POS label only to the first subtoken of each word. It is very important for fine-tuning to have the labels correspond meaningfully to word predictions and having the loss function during fine-tuning ignore the other token predictions in a given word.
 
-For the fine-tuning process, I loaded the pretrained DistilBERT model for token classification and set it up with the appropriate number of labels given by my simplified tagset from above. I fine-tuned the model using the Hugging Face Trainer API, which abstracts and makes model training much easier. I trained for 3 epochs, taking about 15 minutes on my laptop. The fine-tuned model was then pushed to Hugging Face \cite{distilbert_brown_pos}, where it is publicly available for open source use.
+For the fine-tuning process, I loaded the pretrained DistilBERT model for token classification \cite{huggingface_distilbert} and set it up with the appropriate number of labels given by my simplified tagset from above. I fine-tuned the model using the Hugging Face Trainer API \cite{huggingface_trainer}, which abstracts and makes model training much easier. I trained for 3 epochs, taking about 15 minutes on my laptop. The fine-tuned model was then pushed to Hugging Face \cite{distilbert_brown_pos}, where it is publicly available.
 
 \section{Results and Analysis}
 
 The fine-tuning process resulted in a final loss of 0.0573 on the training set at the end of epoch 3, which was a good sign that the model has learned the motions of classifying POS tags well enough. Due to this, I knew that the model was likely ready for further evaluation.
 
-The fine-tuned model achieved a very strong performance on the test set. Due to the large number of tags, I opted to not report the scores for each tag in this report (it is in the Jupyter Notebook), but rather for the entire test split. The overall classification report for the fine-tuned model is shown in Table \ref{tab:classification_report_overall}.
+The fine-tuned model achieved a very strong performance on the test set. Due to the large number of tags, I opted to not report the scores for each tag here (it is in the Jupyter Notebook), instead for the entire test split. The classification report for the fine-tuned model is shown in Table \ref{tab:classification_report_overall}.
+
+\begin{table}[!ht]
+\centering
+\caption{Overall Classification Metrics on Test Split}
+\label{tab:classification_report_overall}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Metric} & \textbf{Precision} & \textbf{Recall} & \textbf{F1} & \textbf{Support} \\
+\hline
+Accuracy & N/A & N/A & 0.98 & 231,659 \\
+Macro Avg & 0.86 & 0.85 & 0.85 & 231,659 \\
+Weighted Avg & 0.98 & 0.98 & 0.98 & 231,659 \\
+\hline
+\end{tabular}
+\end{table}
+
+The accuracy of 0.98, F1-Macro average of 0.85, and F1-Weighted average of 0.98 over a support (test set size) of 231,659 words indicate that the fine-tuned DistilBERT model performs very well for POS tagging tasks. However, the F1-Macro average is a better overall indicator across all tags, because it takes into account class imbalance in the dataset, as some tags are more prevalent. Still, its value of 0.85 is quite strong for a POS tagging task with 105 distinct tags, and it would be likely that this score would be worse on the base tagset of the Brown corpus due to limited data points.
+
+A confusion matrix was also generated to visualize the fine-tuned model's performance on the test split. The confusion matrix is a square matrix where the rows represent the true tags and the columns represent the predicted tags. The confusion matrix for the test split is not shown due to its unreadability (large number of tags, in the Jupyter Notebook), but note that almost all classifications are correct.
+
+The top ten most common misclassifications are shown in Table \ref{tab:top_errors}. The most common misclassification is the model predicting a noun (NN) when the true tag is an adjective (JJ), which occurs 233 times in the test split. This could be due to the fact that some words can function as both nouns and adjectives depending on context, like the phrase "shoe shop", where a noun describes another noun. The second most common misclassification is the model predicting a noun (NN) when the true tag is a proper noun (NP), which occurs 188 times in the test split. This could be due to the fact that proper nouns can sometimes be mistaken for common nouns, especially if they are not capitalized. The pretrained model is set as the uncased version of DistilBERT, which may contribute to this error.
+
+\begin{table}[!ht]
+\centering
+\caption{Top 10 Most Common POS Tagging Errors on Test Split}
+\label{tab:top_errors}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{True Tag} & \textbf{Predicted Tag} & \textbf{Count} \\
+\hline
+NN & JJ & 233 \\
+NP & NN & 188 \\
+JJ & NN & 183 \\
+NN & NP & 121 \\
+QL & RB & 113 \\
+RB & QL & 100 \\
+VBN & VBD & 96 \\
+IN & CS & 84 \\
+CS & IN & 72 \\
+VBD & VBN & 71 \\
+\hline
+\end{tabular}
+\end{table}
 
 \section{Conclusion}
 
+This project and project report shows that a small BERT model like DistilBERT can be effectively fine-tuned for POS tagging tasks (and possibly other NLP tasks), achieving a very strong performance on the Brown corpus, with rare misclassifications between POS categories that may result from ambiguous words functioning as multiple parts of speech.
+
+\newpage
 \bibliography{bibliography}
 \end{document}
